@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import bookServer from './bookServer'
 
 
+
+
 const PhoneListEntry = ({ person, handleDelete }) => {
 
   return (
@@ -32,12 +34,21 @@ const PersonForm = ({ name, number, handleName, handleNumber, Submit }) => {
 
 const FilterForm = ({value, call}) => <input value={value} onChange={call} />
 
+const Notification = ({message}) =>{
+    if(message){
+      return <p class="message">{message}</p>
+    }else{
+      return null
+    }
+}
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterVal, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   let personsToshow = filterVal.length === 0 ? persons : persons.filter(person => person.name.toLowerCase().includes(filterVal.toLowerCase()))
 
@@ -71,6 +82,13 @@ const App = () => {
     }
   }
 
+  const sendMessage = (message) =>{
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 4000);
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     if (newName.length === 0 || newNumber.length === 0) {
@@ -87,14 +105,24 @@ const App = () => {
       .updateExisting(existingPerson.id, newPerson)
       .then(response => {
         setPersons(persons.map((person) => person.id !== existingPerson.id ? person : response))
-
+        sendMessage(`Changed ${newPerson.name}`)
       })
-      return
+      .catch(error =>{
+        console.log("change fail")
+        sendMessage("User has been already deleted from the server")
+      })
+
     }else{
       bookServer
       .addNew(newPerson)
       .then(response => {
         setPersons(persons.concat(response))
+        sendMessage(`Added ${newPerson.name}`)
+      })
+      .catch(error =>{
+        console.log("add fail")
+        sendMessage("Something's wrong, operation wasn't succesful")
+        return
       })
     }
 
@@ -106,6 +134,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={errorMessage}/>
       <h2>Phonebook</h2>
       <FilterForm value={filterVal} call={handleFilterChange} />
       <h2>Add new</h2>
