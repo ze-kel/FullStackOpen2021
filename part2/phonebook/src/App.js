@@ -1,15 +1,19 @@
-import React, { useState, useEffect  } from 'react'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react'
+import bookServer from './bookServer'
 
 
+const PhoneListEntry = ({ person, handleDelete }) => {
 
-const PhoneListEntry = ({name, number}) => <li>{name} | {number} </li>
-
-const RenderPhoneList = ({ persons }) => {
   return (
-    <ul>
-      {persons.map(person => <PhoneListEntry key={person.name} name={person.name} number={person.number} />)}
-    </ul>)
+    <p>{person.name} | {person.number} <button onClick={() => handleDelete(person.id, person.name)}>Delete</button> </p> 
+  )
+}
+
+const RenderPhoneList = ({ persons,handleDelete }) => {
+  return (
+    <div>
+      {persons.map(person => <PhoneListEntry key={person.id} person={person} handleDelete={handleDelete}/>)}
+    </div>)
 }
 
 const PersonForm = ({ name, number, handleName, handleNumber, Submit }) => {
@@ -39,12 +43,11 @@ const App = () => {
 
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+      bookServer
+      .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
-
   }, [])
 
 
@@ -58,19 +61,44 @@ const App = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
   }
+  const handleDelete = (id, name) =>{
+    if(window.confirm(`Delete ${name}?`)){
+      bookServer
+      .remove(id)
+      .then(() =>{
+        setPersons(persons.filter( (person) => person.id != id ) )
+      })
+    }
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    }
     if (newName.length === 0 || newNumber.length === 0) {
       alert("Can't have empty fields")
       return
     }
+    const newPerson = { name: newName, number: newNumber }
 
-    setPersons(persons.concat({ name: newName, number: newNumber }))
+    let existingPerson = persons.filter(person => person.name === newPerson.name)[0]
+
+    if (existingPerson) {
+      if(!window.confirm(`${newPerson.name} exists. Update?`)){return}
+      bookServer
+      .updateExisting(existingPerson.id, newPerson)
+      .then(response => {
+        setPersons(persons.map((person) => person.id !== existingPerson.id ? person : response))
+
+      })
+      return
+    }else{
+      bookServer
+      .addNew(newPerson)
+      .then(response => {
+        setPersons(persons.concat(response))
+      })
+    }
+
+
     setNewName("")
     setNewNumber("")
   }
@@ -78,13 +106,12 @@ const App = () => {
 
   return (
     <div>
-
       <h2>Phonebook</h2>
       <FilterForm value={filterVal} call={handleFilterChange} />
       <h2>Add new</h2>
       <PersonForm name={newName} number={newNumber} handleName={handleNameChange} handleNumber={handleNumberChange} Submit={addPerson} />
       <h2>Numbers</h2>
-      <RenderPhoneList persons={personsToshow} />
+      <RenderPhoneList persons={personsToshow} handleDelete={handleDelete}  />
     </div>
   )
 }
