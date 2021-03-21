@@ -1,0 +1,34 @@
+{
+  "persons": [
+    {
+      "name": "Arto Hellas",
+      "number": "040-123456",
+      "id": 1
+    },
+    {
+      "name": "Dan Abramov",
+      "number": "12-43-234345",
+      "id": 3
+    },
+    {
+      "name": "Gyyu",
+      "number": "13234",
+      "id": 4
+    },
+    {
+      "name": "gg",
+      "number": "1337",
+      "id": 5
+    },
+    {
+      "name": "wqert",
+      "number": "1235",
+      "id": 8
+    },
+    {
+      "name": "ertert",
+      "number": "564567",
+      "id": 9
+    }
+  ]
+}
