@@ -36,7 +36,7 @@ const FilterForm = ({value, call}) => <input value={value} onChange={call} />
 
 const Notification = ({message}) =>{
     if(message){
-      return <p class="message">{message}</p>
+      return <p className="message">{message}</p>
     }else{
       return null
     }
@@ -108,8 +108,9 @@ const App = () => {
         sendMessage(`Changed ${newPerson.name}`)
       })
       .catch(error =>{
-        console.log("change fail")
-        sendMessage("User has been already deleted from the server")
+        console.log(error.response.data)
+        sendMessage(error.response.data.error)
+        return
       })
 
     }else{
@@ -120,8 +121,8 @@ const App = () => {
         sendMessage(`Added ${newPerson.name}`)
       })
       .catch(error =>{
-        console.log("add fail")
-        sendMessage("Something's wrong, operation wasn't succesful")
+        console.log(error.response.data)
+        sendMessage(error.response.data.error)
         return
       })
     }
