@@ -2,21 +2,32 @@ const blogsRouter = require('express').Router()
 const Blog = require("../models/blog")
 
 blogsRouter.get('/', async (request, response) => {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user', { username: 1, id: 1, name: 1 })
     response.json(blogs)
 })
 
 blogsRouter.post('/', async (request, response) => {
-    if (!request.body.title || !request.body.author) {
-        response.status(400).end()
-    } else {
-        const blog = new Blog(request.body)
-        if (!blog.likes) {
-            blog.likes = 0
-        }
-        const result = await blog.save()
-        response.status(201).json(result)
+    const body = request.body
+    const user = request.user
+
+    if (!user) {
+        response.status(403)
     }
+
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes,
+        user: user._id
+    })
+
+
+    const savedEntry = await blog.save()
+    user.entries = user.entries.concat(savedEntry._id)
+    await user.save()
+
+    response.status(201).json(savedEntry)
 })
 
 blogsRouter.get('/:id', async (request, response) => {
@@ -29,9 +40,18 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    await Blog.findByIdAndRemove(request.params.id)
+    const requestingUser = request.user
 
-    response.status(204).end()
+    const requstedBlog = await Blog.findById(request.params.id)
+
+    if (!requstedBlog.user || requstedBlog.user.toString() == requestingUser._id.toString()) {
+        console.log("deletion allowed")
+        await Blog.findByIdAndRemove(request.params.id)
+        response.status(204).end()
+    } else {
+        response.status(403).end()
+    }
+
 })
 
 blogsRouter.put('/:id', async (request, response) => {

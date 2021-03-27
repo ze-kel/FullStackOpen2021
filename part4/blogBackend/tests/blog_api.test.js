@@ -4,13 +4,31 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test.helper')
+
+let auth_TOKEN
 
 beforeEach(async () => {
     await Blog.deleteMany({})
 
     const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
     const promises = blogObjects.map(blog => blog.save())
+
+    await User.deleteMany({})
+
+    const testuser = {
+        username: "Jake",
+        password: "123546568",
+        name: "Jake Watson"
+    }
+
+    await api.post('/api/users').send(testuser)
+
+    const loginResponse = await api.post('/api/login').send({ username: testuser.username, password: testuser.password })
+
+    auth_TOKEN = "Bearer " + loginResponse.body.token
+
     await Promise.all(promises)
 })
 
@@ -56,6 +74,7 @@ describe('ADDING ENTRIES', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', auth_TOKEN)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -82,11 +101,13 @@ describe('ADDING ENTRIES', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', auth_TOKEN)
             .send(noTitle)
             .expect(400)
 
         await api
             .post('/api/blogs')
+            .set('Authorization', auth_TOKEN)
             .send(noAuthor)
             .expect(400)
 
@@ -104,6 +125,7 @@ describe('ADDING ENTRIES', () => {
 
         const response = await api
             .post('/api/blogs')
+            .set('Authorization', auth_TOKEN)
             .send(newBlog)
             .expect(201)
 
