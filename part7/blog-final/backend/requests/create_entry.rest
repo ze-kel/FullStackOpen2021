@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1pa2UiLCJpZCI6IjYwNWY1NmJjODcxMzU2NzVjNGMxM2FlZiIsImlhdCI6MTYxNjg2MzU4MX0.iIGgIe0xPzvLdntm9xL7Fga6aj-HBeax_6TMvF7Kbe8
+
+{
+    "title": "FOR DELETION",
+    "author": "kirill",
+    "url": "/rrr2",
+    "likes": 1337
+}

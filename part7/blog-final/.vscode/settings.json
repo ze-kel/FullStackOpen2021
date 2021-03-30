@@ -1,0 +1,11 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "editor.formatOnPaste": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 160
+}
