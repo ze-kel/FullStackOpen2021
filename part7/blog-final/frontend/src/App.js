@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import BlogList from './components/BlogList'
-import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import { useDispatch } from 'react-redux'
 import Notification from './components/Notification'
@@ -21,10 +20,9 @@ const App = () => {
         dispatch(initUserlist())
     }, [dispatch])
     return (
-        <div>
-            <h2>blogs</h2>
-            <Router>
-                <Menu />
+        <Router>
+            <Menu />
+            <div className="max-w-2xl m-auto">
                 <Notification />
                 <LoginForm />
                 <Switch>
@@ -32,7 +30,6 @@ const App = () => {
                         <Blog />
                     </Route>
                     <Route path="/blogs">
-                        <BlogForm />
                         <BlogList />
                     </Route>
                     <Route path="/users/:id">
@@ -42,8 +39,8 @@ const App = () => {
                         <UserList />
                     </Route>
                 </Switch>
-            </Router>
-        </div>
+            </div>
+        </Router>
     )
 }
 

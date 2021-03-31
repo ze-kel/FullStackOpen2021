@@ -1,19 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import BlogForm from './BlogForm'
+import Togglable from './Togglable'
+import Style from './GenericStyles'
 
 const BlogList = (props) => {
+    if (!props.user) {
+        return null
+    }
     return (
         <div>
-            <h2>Blogs</h2>
-            {props.blogs.map((blog) => {
-                console.log(blog)
-                return (
-                    <Link key={blog.id} to={'/blogs/' + blog.id}>
-                        <p>{blog.title}</p>
-                    </Link>
-                )
-            })}
+            <h2 className="text-4xl">Blogs</h2>
+            <Togglable buttonLabel="Add Blog">
+                <BlogForm />
+            </Togglable>
+            <div className={Style.ClickableListContaier}>
+                {props.blogs.map((blog) => {
+                    console.log(blog)
+                    return (
+                        <Link className={Style.ClickableListItem + ' flex justify-between'} key={blog.id} to={'/blogs/' + blog.id}>
+                            <p className="inline-flex">{blog.title}</p> <p className="inline-flex">{blog.likes} likes</p>
+                        </Link>
+                    )
+                })}
+            </div>
         </div>
     )
 }

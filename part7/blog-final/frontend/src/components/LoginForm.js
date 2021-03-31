@@ -3,6 +3,7 @@ import { setUser } from '../reducers/userReducer'
 import { connect } from 'react-redux'
 import loginService from '../services/login'
 import { setNotification } from '../reducers/notificationReducer'
+import Style from './GenericStyles'
 
 const LoginForm = (props) => {
     if (props.user) {
@@ -31,17 +32,31 @@ const LoginForm = (props) => {
     }
     return (
         <div>
-            <h2>Login to app</h2>
-            <form onSubmit={handleSubmit}>
+            <h2 className="text-4xl">Login to app</h2>
+            <form className="my-4" onSubmit={handleSubmit}>
                 <div>
-                    username
-                    <input type="text" value={username} name="Username" id="username" onChange={(event) => setUsername(event.target.value)} />
+                    <p className="my-1">Username</p>
+                    <input
+                        className={Style.Form}
+                        type="text"
+                        value={username}
+                        name="Username"
+                        id="username"
+                        onChange={(event) => setUsername(event.target.value)}
+                    />
                 </div>
-                <div>
-                    password
-                    <input type="password" value={password} name="Password" id="password" onChange={(event) => setPassword(event.target.value)} />
+                <div className="mt-2">
+                    <p className="my-1">Password</p>
+                    <input
+                        className={Style.Form}
+                        type="password"
+                        value={password}
+                        name="Password"
+                        id="password"
+                        onChange={(event) => setPassword(event.target.value)}
+                    />
                 </div>
-                <button type="submit" id="loginbutton">
+                <button className={Style.Button + ' my-4'} type="submit" id="loginbutton">
                     login
                 </button>
             </form>

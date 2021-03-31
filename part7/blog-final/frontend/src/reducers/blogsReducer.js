@@ -12,6 +12,17 @@ export const addLike = (blog) => {
     }
 }
 
+export const addComment = (blog, comment) => {
+    return async (dispatch) => {
+        const newComment = await blogService.addComment(blog.id, comment)
+        const updatedBlog = blog.comments.push(newComment)
+        dispatch({
+            type: 'UPDATE_BLOG',
+            updatedBlog: updatedBlog,
+        })
+    }
+}
+
 export const addBlog = (blog) => {
     return async (dispatch) => {
         const newBlog = await blogService.create(blog)
