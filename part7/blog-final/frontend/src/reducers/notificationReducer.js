@@ -24,7 +24,6 @@ export const setNotification = (text) => {
 }
 
 const notificationReducer = (state = '', action) => {
-    console.log(action)
     switch (action.type) {
         case 'SET_NOTIF':
             return action.notification

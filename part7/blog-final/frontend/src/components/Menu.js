@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { removeUser } from '../reducers/userReducer'
+import { Link } from 'react-router-dom'
 
 const Menu = (props) => {
     const LoggedUserInfo = () => {
@@ -15,7 +16,13 @@ const Menu = (props) => {
             return ''
         }
     }
-    return LoggedUserInfo()
+    return (
+        <div className="menu">
+            <Link to="/blogs">Blogs</Link>
+            <Link to="/users">Users</Link>
+            {LoggedUserInfo()}
+        </div>
+    )
 }
 
 const mapStateToProps = (state) => {

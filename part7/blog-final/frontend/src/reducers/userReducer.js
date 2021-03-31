@@ -22,7 +22,6 @@ export const removeUser = () => {
 export const initUser = () => {
     return async (dispatch) => {
         const loggedUserJSON = window.localStorage.getItem('loggedappUser')
-        console.log('got user from storage', loggedUserJSON)
         const user = JSON.parse(loggedUserJSON)
         if (loggedUserJSON) {
             dispatch({

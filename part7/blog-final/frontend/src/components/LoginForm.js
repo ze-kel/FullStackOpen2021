@@ -21,6 +21,7 @@ const LoginForm = (props) => {
             props.setUser(user)
             setUsername('')
             setPassword('')
+            props.setNotification('You are logged in!')
         } catch (e) {
             console.log(e)
             if (e.message.includes('401')) {
