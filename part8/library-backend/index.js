@@ -162,8 +162,7 @@ const resolvers = {
 
 const server = new ApolloServer({
     typeDefs,
-    resolvers,
-    cors: false
+    resolvers
 })
 
 server.listen().then(({ url }) => {
