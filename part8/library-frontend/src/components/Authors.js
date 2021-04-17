@@ -8,10 +8,6 @@ const Authors = (props) => {
 
   const [name, setAuthor] = useState('')
   const [born, setBorn] = useState(1)
-
-  console.log(born)
-
-  console.log("selected author", name)
   const authors = useQuery(ALL_AUTHORS)
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
@@ -54,7 +50,7 @@ const Authors = (props) => {
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
-              <td>{a.bookCount}</td>
+              <td>{a.booksWritten}</td>
             </tr>
           )}
         </tbody>
