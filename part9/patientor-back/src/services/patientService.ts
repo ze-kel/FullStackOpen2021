@@ -4,21 +4,30 @@ import { v1 as uuid } from 'uuid';
 
 import { Patient, NonSensitivePatient, NewPatient } from '../types';
 
-const getPatientData = (): Patient[] => {
+const getPatientsData = (): Patient[] => {
     return patientData;
 };
 
-const getNonSensitivePatientData = (): NonSensitivePatient[] => {
+const getNonSensitivePatientsData = (): NonSensitivePatient[] => {
     const mappedData = patientData.map(
-        ({ id, name, dateOfBirth, gender, occupation }) => ({
+        ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
             id,
             name,
             dateOfBirth,
             gender,
             occupation,
+            entries,
         })
     );
     return mappedData;
+};
+
+const getNonSensitivePatientData = (id: string): NonSensitivePatient => {
+    const data = patientData.filter((patientData) => patientData.id === id);
+    if (data.length < 1) {
+        throw new Error('No patient with such id found');
+    }
+    return data[0];
 };
 
 const addPatientData = (patient: NewPatient): Patient => {
@@ -30,4 +39,9 @@ const addPatientData = (patient: NewPatient): Patient => {
     return newPatient;
 };
 
-export default { getPatientData, addPatientData, getNonSensitivePatientData };
+export default {
+    getPatientsData,
+    addPatientData,
+    getNonSensitivePatientData,
+    getNonSensitivePatientsData,
+};
