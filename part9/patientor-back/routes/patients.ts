@@ -3,7 +3,7 @@ import express from 'express';
 
 import patientService from '../src/services/patientService';
 
-import ToNewPatient from '../src/utils';
+import ultils from '../src/utils';
 
 import { NonSensitivePatient } from '../src/types';
 
@@ -27,9 +27,20 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log(req.body);
-    const newPatient = ToNewPatient(req.body);
+    const newPatient = ultils.ToNewPatient(req.body);
     const createdPatient = patientService.addPatientData(newPatient);
     res.send(createdPatient);
+});
+
+router.post('/:id', (req, res) => {
+    console.log(req.params.id);
+    console.log(req.body);
+
+    const newEntry = ultils.ToNewEntry(req.body);
+
+    const updatedPatient = patientService.addEntry(req.params.id, newEntry);
+
+    res.json(updatedPatient);
 });
 
 export default router;

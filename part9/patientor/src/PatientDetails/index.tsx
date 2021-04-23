@@ -1,15 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import { Button } from 'semantic-ui-react';
 
-import { PatientFormValues } from '../AddPatientModal/AddPatientForm';
-import AddPatientModal from '../AddPatientModal';
-import { Diagnosis, Patient } from '../types';
-import { apiBaseUrl } from '../constants';
+import AddEntryModal from '../AddEntryModal';
+import { Diagnosis, Entry, Patient } from '../types';
 import HealthRatingBar from '../components/HealthRatingBar';
 
-import { useStateValue } from '../state';
+import { apiBaseUrl } from '../constants';
+
+import { useStateValue, updatePatient } from '../state';
 import { useParams } from 'react-router';
+import axios from 'axios';
+
+import { EntryFormValues } from '../AddEntryModal/AddEntryForm';
+
+const assertNever = (value: never): never => {
+    throw new Error(
+        `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+};
 
 const PatientDetails = () => {
     const [{ patients, diagnoses }, dispatch] = useStateValue();
@@ -19,9 +28,31 @@ const PatientDetails = () => {
     const id = params.id;
     const patient = patients[id];
 
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+    const openModal = (): void => setModalOpen(true);
+
+    const closeModal = (): void => {
+        setModalOpen(false);
+        setError(undefined);
+    };
+
     if (!patient) {
         return <div>No patient found</div>;
     }
+
+    const submitNewDiag = async (values: EntryFormValues) => {
+        try {
+            const { data: updatedPatient } = await axios.post<Patient>(
+                `${apiBaseUrl}/patients/${id}`,
+                values
+            );
+            dispatch(updatePatient(updatedPatient));
+            closeModal();
+        } catch (e) {
+            console.error(e.response?.data || 'Unknown Error');
+            setError(e.response?.data?.error || 'Unknown error');
+        }
+    };
 
     const ShowDiagCodes = ({ codes }: { codes: string[] | undefined }) => {
         if (!codes) {
@@ -47,6 +78,48 @@ const PatientDetails = () => {
         );
     };
 
+    const ShowExtraDetail = ({ entry }: { entry: Entry }) => {
+        switch (entry.type) {
+            case 'Hospital':
+                return (
+                    <div>
+                        In hospital. Discharged at {entry.discharge.date} with{' '}
+                        {entry.discharge.criteria}
+                    </div>
+                );
+            case 'HealthCheck':
+                return (
+                    <div>
+                        Performed health check.
+                        <HealthRatingBar
+                            showText={false}
+                            rating={entry.healthCheckRating}
+                        />
+                    </div>
+                );
+            case 'OccupationalHealthcare':
+                return (
+                    <div>
+                        Occupational Healthcare. Employer {entry.employerName}.
+                        {entry.sickLeave
+                            ? ` Sick leave from ${entry.sickLeave.startDate} to ${entry.sickLeave.endDate}`
+                            : ''}
+                        {entry.healthCheckRating ? (
+                            <HealthRatingBar
+                                showText={false}
+                                rating={entry.healthCheckRating}
+                            />
+                        ) : (
+                            ''
+                        )}
+                    </div>
+                );
+            default:
+                assertNever;
+                return <div></div>;
+        }
+    };
+
     return (
         <div>
             <h2>{patient.name}</h2>
@@ -64,9 +137,17 @@ const PatientDetails = () => {
                         <h5>{e.date}</h5>
                         <h4>{e.description}</h4>
                         <ShowDiagCodes codes={e.diagnosisCodes} />
+                        <ShowExtraDetail entry={e} />
                     </div>
                 );
             })}
+            <AddEntryModal
+                modalOpen={modalOpen}
+                onSubmit={submitNewDiag}
+                error={error}
+                onClose={closeModal}
+            />
+            <Button onClick={() => openModal()}>Add New Entry</Button>
         </div>
     );
 };
